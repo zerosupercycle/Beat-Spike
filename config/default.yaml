@@ -1,0 +1,108 @@
+# Beat Spike — Polymarket beat-cross momentum bot
+
+bot:
+  mode: paper
+  log_level: INFO
+  use_server_time_sync: true
+  server_time_sync_interval_seconds: 3600
+  server_time_sync_samples: 20
+  server_time_sync_keep: 10
+  time_offset_sec: 0
+  clob_order_warmup_enabled: true
+  clob_order_warmup_price: 0.01
+  clob_order_warmup_shares: 5
+  fast_order_presign_enabled: true  # presign UP+DOWN limit @ trading.order.limit_price at slug start
+
+api:
+  gamma_url: "https://gamma-api.polymarket.com"
+  clob_url: "https://clob.polymarket.com"
+  ws_url: "wss://ws-subscriptions-clob.polymarket.com/ws/market"
+  rtds_url: "wss://ws-live-data.polymarket.com"
+
+markets:
+  assets: [btc]  # btc | eth | sol | xrp — assets to load feeds and UI for
+  intervals: [5m]  # 5m | 15m | 1h — Polymarket up/down slug lengths
+  enabled_assets: [btc]  # optional subset to trade; omit/null to use assets
+
+entry:
+  entry_moment_seconds: 240
+  end_moment_seconds: 0
+
+strategy:
+  price_feed: binance  # chainlink | binance
+  lookback_seconds: 30  # default when by_asset omits lookback_seconds
+  sustain_seconds: 0    # hold time after |Δ|≥threshold (0 = trigger on first tick)
+  poll_interval_ms: 250
+
+  # Momentum: |Δ| from price (now − lookback_seconds) to now must exceed delta_threshold_usd
+  # Beat direction (requires lookback cross of slug-open beat on signal feed):
+  #   down→up cross → buy UP  |  up→down cross → buy DOWN
+  # fixed_usd = use by_asset delta_threshold_usd directly
+  # atr_multiplier = max(10% of fixed, ATR × multiplier) — often ~$5 BTC; too loose in paper
+  threshold_mode: fixed_usd
+  atr_period_samples: 30
+  atr_multiplier: 2.5
+
+  by_asset:
+    btc:
+      delta_threshold_usd: 24.0
+      lookback_seconds: 3.0
+    eth:
+      delta_threshold_usd: 1.4
+      lookback_seconds: 3.0
+    sol:
+      delta_threshold_usd: 0.8
+      lookback_seconds: 3.0
+    xrp:
+      delta_threshold_usd: 0.018
+      lookback_seconds: 45.0
+
+  time_limit_cancel_seconds: 4  # increase to 30–60 for slower limit fills
+
+risk:
+  enabled: false
+  starting_bankroll_usd: 1000.0
+  max_daily_deployed_usd: 200.0
+  max_daily_drawdown_pct: 5.0
+  max_trades_per_day: 50
+
+trading:
+  position_size: shares
+  shares: 5.0
+  usd: 10.0
+  order:
+    style: limit
+    limit_reference: mid
+    limit_price_offset: 0.01
+    limit_price: 0.50
+    limit_order_type: GTC
+    market_order_type: FAK
+
+execution:
+  enabled: false
+  api_key: ""
+  api_secret: ""
+  api_passphrase: ""
+  chain_id: 137
+  signature_type: 3
+  rpc_url: ""
+
+storage:
+  trades_path: "data/trades.jsonl"
+  status_path: "data/bot_status.json"
+  trade_snapshots_dir: "data/trade_snapshots"
+  log_path: "data/beat-spike.log"
+
+feeds:
+  source: server
+  server_url: http://127.0.0.1:8788
+  momentum_window_seconds: 4.0
+
+# Chainlink Data Streams (REST poll when credentials set; else Polymarket RTDS WebSocket).
+# Override secret via BEAT_SPIKE_CHAINLINK__STREAMS_SECRET in .env
+chainlink:
+  streams_user_id: ""
+  streams_secret: ""
+  latest_poll_sec: 3.0
+  feed_ids:
+    btc:  '0x00039d9e45394f473ab1f050a1b963e6b05351e52d71e507509ada0c95ed75b8'

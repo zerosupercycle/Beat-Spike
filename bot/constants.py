@@ -1,0 +1,4 @@
+INTERVAL_SECONDS = {"5m": 300, "15m": 900, "1h": 3600}
+POLYMARKET_MIN_SHARES = 5.0
+WS_MSG_BOOK = "book"
+ASSETS = ("BTC", "ETH", "SOL", "XRP")

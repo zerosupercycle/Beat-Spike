@@ -1,0 +1,29 @@
+# External wallet/profile monitor (independent of bot strategy).
+# Run: make monitor  (requires make server for price feed history)
+
+enabled: false
+
+# Polymarket profile URLs or @handles to watch (add your own targets)
+targets: []
+
+# Dashboard server with live feed ring buffer (make server)
+server_url: "http://127.0.0.1:8788"
+
+rtds_url: "wss://ws-live-data.polymarket.com"
+# Set false if Polymarket RTDS returns 429 — Data API poll below still detects buys.
+rtds_enabled: false
+rtds_rate_limit_backoff_sec: 90
+
+# Data API activity poll (primary when rtds_enabled=false)
+poll_fallback_sec: 8
+
+capture:
+  before_sec: 300
+  after_sec: 300
+  # Only record crypto up/down market buys (btc-updown-5m-…)
+  slug_pattern: "updown"
+
+storage:
+  events_path: "data/monitor_events.jsonl"
+  snapshots_dir: "data/monitor_snapshots"
+  state_path: "data/monitor_state.json"
