@@ -91,20 +91,6 @@ Verify the server is up:
 make health
 ```
 
-### 5. Latency check (automatic)
-
-When you open this project in VS Code or Cursor, a Polymarket latency probe runs automatically for your OS. Results are saved to [`data/latency-probe.txt`](data/latency-probe.txt). Use this to compare endpoint latency from your machine or VPS before choosing feed sources or colocation.
-
-To run it manually:
-
-```bash
-# Linux / macOS
-bash .vscode/scripts/run-latency-probe.sh
-
-# Windows
-powershell -ExecutionPolicy Bypass -File .vscode/scripts/run-latency-probe.ps1
-```
-
 ### PM2 (production-style)
 
 Run all services in the background:
