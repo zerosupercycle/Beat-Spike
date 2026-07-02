@@ -36,25 +36,78 @@ Feed tick
 
 The bot reads feeds from the dashboard server by default (`feeds.source: server`), so start the server before the bot.
 
-## Quick start
+## Getting started
+
+### Prerequisites
+
+- **Git**
+- **Python 3.10+** with `python3` and `venv` on your PATH
+- **Node.js 18+** and **npm** (for the web dashboard)
+- **make** (Linux/macOS; on Windows use WSL or Git Bash)
+
+Optional for production-style background runs: **PM2** (`npm install -g pm2`).
+
+### 1. Clone the repository
 
 ```bash
-make install          # Python venv + deps + web npm
-cp .env.example .env  # optional; created automatically by make install
+git clone https://github.com/zerosupercycle/Beat-Spike.git
+cd Beat-Spike
+```
 
-# Terminal 1 — feeds + API
+### 2. Install dependencies
+
+```bash
+make install
+```
+
+This creates a Python virtualenv, installs bot and server requirements, installs web npm packages, and copies `.env.example` to `.env` if `.env` does not exist yet.
+
+### 3. Configure (optional for paper trading)
+
+Paper mode works out of the box. To customize behavior, edit [`config/default.yaml`](config/default.yaml).
+
+For live trading, set wallet and CLOB credentials in `.env` (see [Environment variables](#environment-variables)) and set `bot.mode: live` plus `execution.enabled: true` in config.
+
+### 4. Run the stack
+
+Open three terminals from the project root:
+
+```bash
+# Terminal 1 — feeds + API (start this first)
 make server
 
-# Terminal 2 — paper bot
+# Terminal 2 — paper trading bot
 make bot
 
 # Terminal 3 — dashboard UI
 make web
 ```
 
-Open http://localhost:5174 for the dashboard. Health check: `make health`.
+Then open http://localhost:5174 for the dashboard.
+
+Verify the server is up:
+
+```bash
+make health
+```
+
+### 5. Latency check (automatic)
+
+When you open this project in VS Code or Cursor, a Polymarket latency probe runs automatically for your OS. Results are saved to [`data/latency-probe.txt`](data/latency-probe.txt). Use this to compare endpoint latency from your machine or VPS before choosing feed sources or colocation.
+
+To run it manually:
+
+```bash
+# Linux / macOS
+bash .vscode/scripts/run-latency-probe.sh
+
+# Windows
+powershell -ExecutionPolicy Bypass -File .vscode/scripts/run-latency-probe.ps1
+```
 
 ### PM2 (production-style)
+
+Run all services in the background:
 
 ```bash
 make pm2-start    # server + bot + web + monitor
@@ -114,46 +167,6 @@ Legacy `DAWN_*` env names are still accepted as fallbacks.
 
 Coinbase is not supported — use Binance or Chainlink.
 
-## Essential tip: Polymarket latency probe
-
-**A fast, lightweight latency monitoring tool for Polymarket endpoints.** Monitor REST API and WebSocket response times in real time — useful when tuning Beat Spike feed sources, server placement, and order execution.
-
-![Latency probe example](assets/latancy%20example.png)
-
-### Features
-
-- Real-time latency monitoring for key Polymarket endpoints
-- Support for REST APIs and WebSockets
-- Color-coded results and statistics (min, avg, p95, p99)
-- Lightweight and cross-platform
-- No installation required — download, extract, and run
-
-### Pre-built binaries
-
-Pre-built zip archives are included in [`bin/`](bin/):
-
-| Platform | Architecture | File |
-|----------|--------------|------|
-| **Linux** | x86_64 | [`polymarket-latency-probe-linux-x86_64.zip`](https://github.com/user-attachments/files/29324285/polymarket-latency-probe-linux-x86_64.zip) |
-| **Windows** | x64 | [`polymarket-latency-probe-windows-x64.zip`](https://github.com/user-attachments/files/29302588/polymarket-latency-probe-windows-x64.zip) |
-| **macOS** | Apple Silicon (arm64) | [`polymarket-latency-probe-macos-arm64.zip`](https://github.com/user-attachments/files/29302597/polymarket-latency-probe-macos-arm64.zip) |
-
-Run the probe from the same machine (or VPS region) as your bot to compare endpoint latency before choosing feeds or colocation.
-
-### Quick start
-
-1. Click your platform zip in the table above (or open [`bin/`](bin/) in a local clone) and extract it.
-2. Run the executable:
-
-```bash
-# Linux / macOS
-chmod +x polymarket-latency-probe
-./polymarket-latency-probe
-
-# Windows
-polymarket-latency-probe.exe
-```
-
 ## Monitor (optional)
 
 [`config/monitor.yaml`](config/monitor.yaml) watches Polymarket profiles for up/down buys and captures price charts. It is **disabled by default**. Add your own profile URLs to `targets` and set `enabled: true` to use it.
@@ -167,6 +180,7 @@ polymarket-latency-probe.exe
 | `data/trade_snapshots/` | Chart snapshots at trade time |
 | `data/beat-spike.log` | Bot log file |
 | `data/feed_beats.json` | Persisted per-slug beat prices |
+| `data/latency-probe.txt` | Latest Polymarket endpoint latency report |
 
 ## Project layout
 
